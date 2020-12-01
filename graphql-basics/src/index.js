@@ -46,7 +46,7 @@ const resolvers = {
         post() {
             return {
                 id: 'Post1',
-                title: 'GraphQL 101',
+                title: 'GraphQL 101.0',
                 body: '',
                 published: false
             }
