@@ -1,3 +1,5 @@
+# Sample GraphQL Queries
+```` graphql
 query{
 greeting(name:"Suresh Kumar",
 position: "Lead Software Engineer")
@@ -31,7 +33,10 @@ published
 
 }
 }
---===================================
+````
+
+## Sample 2
+```` graphql
 query{
 GetPosts(pst: "Azure")
 {
@@ -58,7 +63,9 @@ body
 
 }
 }
--===========================================
+````
+## Sample 3
+```` graphql
 query{
 GetPosts(pst: "Azure")
 {
@@ -95,7 +102,10 @@ name
 }
 }
 }
+````
 
+## Sample 4
+```` graphql
 query{
 GetPosts{
 id
@@ -119,3 +129,4 @@ title
 }
 }
 }
+````
