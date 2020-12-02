@@ -10,7 +10,8 @@ const users = [{
     {
     id: '2',
     name: 'Dhakshith',
-    email: 'SDSurya@live.com'
+        email: 'SDSurya@live.com',
+    age: 6
     },
     {
     id: '3',
@@ -21,25 +22,54 @@ const users = [{
 ]
 //Demo Posts data
 const posts = [{
-        id : "post123",
+        id : "Post1",
         title: "GraphQL",
         body: "Cool graphql lang",
-        published: true
+        published: true,
+        author: '1'
 },
     {
-        id : "post235",
+        id : "Post2",
         title: "ML and AI",
         body: "Azure ML and AI",
-        published: true
+        published: true,
+        author: '1'
     },
      {
-        id : "post358",
+        id : "Post3",
         title: "Azure Certification",
         body: "Azure certification is good for prof",
-        published: true
+        published: true,
+        author: '2'
     }
 ]
 
+const comments = [
+    {
+        id: "Cmt-1",
+        text: "First comments!",
+        author: "2",
+        post: "Post1"
+    }, {
+        
+        id: "Cmt-2",
+        text: "Second comments!",
+        author: "2",
+        post: "Post3"
+    }, {
+        
+        id: "Cmt-3",
+        text: "Third comments!",
+        author: "3",
+        post: "Post3"
+    }, {
+        
+        id: "Cmt-4",
+        text: "Fourth comments!",
+        author: "1",
+        post: "Post2"
+    }
+]
 //Scalar types: String, Boolean, Int, Float, ID, 
 
 const typeDefs = `
@@ -49,16 +79,18 @@ const typeDefs = `
         add (numbers: [Int!]!) : Float!
         grades:[Int!]!
         me: User!
-        post: Post!
-        users (query: String): [User!]!
-        posts (pst: String): [Post!]!
+        GetUsers (query: String): [User!]!
+        GetPosts (pst: String): [Post!]!
+        GetCommets: [Comment!]!
     }
 
     type User{
         id: ID!
         name: String!
         email: String!
-        age: Int
+        age: Int!
+        posts: [Post!]!
+        comments: [Comment!]!
     }
 
     type Post{
@@ -66,6 +98,15 @@ const typeDefs = `
         title: String!
         body: String!
         published: Boolean!
+        author: User!
+        comments: [Comment!]!
+    }
+
+    type Comment{
+        id: ID!
+        text: String!
+        author: User!
+        post: Post!
     }
 `
 // Resolvers
@@ -77,22 +118,6 @@ const resolvers = {
                 return `Hello ${args.name}! you are my favoriate ${args.position}`
             }
             return `Hello!`;
-        },
-        me() {
-            return {
-                id: '123098',
-                name: 'Suresh Kumar',
-                age: 39,
-                email: 'suresh.kumars@live.com'
-            };
-        },
-        post() {
-            return {
-                id: 'Post1',
-                title: 'GraphQL 101.0',
-                body: '',
-                published: false
-            }
         },
         sum(parent, args, ctx, info) {
             return args.frstNum + args.secNum
@@ -107,7 +132,7 @@ const resolvers = {
                 return accumulate + currentValue
             })
         },
-        users(parent, args, ctx, info) {
+        GetUsers(parent, args, ctx, info) {
             if (!args.query) {
                 return users;
             }
@@ -117,7 +142,7 @@ const resolvers = {
                 })
             }
         },
-        posts(parent, args, ctx, info) {
+        GetPosts(parent, args, ctx, info) {
             if (!args.pst) {
                 return posts;
             }
@@ -129,6 +154,45 @@ const resolvers = {
                         return post.title.toLowerCase().includes(args.pst.toLowerCase())
                 })
             }
+        },
+        GetCommets(parent, args, ctx, info) {
+            return comments;
+        }
+    },
+    Post: {
+        author(parent, args, ctx, info) {
+            return users.find((user) => { 
+                return user.id == parent.author
+            })
+        },
+        comments(parent, args, ctx, info) {
+            return comments.filter((comt) => {
+                return comt.post == parent.id
+            })
+        }
+    },
+    User: {
+        posts(parent, args, ctx, info) {
+            return posts.filter((post) => { 
+                return post.author == parent.id
+            })
+        },
+        comments(parent, args, ctx, info) {
+            return comments.filter((comt) => {
+                return comt.author == parent.id
+            })
+        }
+    },
+    Comment: {
+        author(parent, arg, ctx, info) {
+             return users.find((user) => { 
+                return user.id == parent.author
+            })
+        },
+        post(parent, arg, ctx, info) {
+            return posts.find((post) => { 
+                return post.id ==parent.post
+            })
         }
     }
 }
