@@ -137,12 +137,53 @@ query {
 
 ## Sample 5 Mutation
 
+### Create new user
+
 ```graphql
 mutation {
   createUser(name: "TestUser", email: "testuser@email.com", age: 34) {
     id
     name
     email
+    age
+  }
+}
+```
+
+### Create new user by babel-plugin-transform-object-rest-spread (plugin)
+
+```graphql
+mutation {
+  createUser(
+    inputdata: { name: "TestUser", email: "testuser@email.com", age: 34 }
+  ) {
+    id
+    name
+    email
+    age
+  }
+}
+```
+
+### Delete user with it's posts and comments also
+
+```graphql
+mutation {
+  deleteUser(id: "1") {
+    id
+    email
+  }
+}
+```
+
+### update user
+
+```graphql
+mutation {
+  updateUser(id: "1", data: { name: "SSK", age: null }) {
+    id
+    email
+    name
     age
   }
 }
