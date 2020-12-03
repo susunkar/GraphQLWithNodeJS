@@ -1,4 +1,5 @@
 const {GraphQLServer} = require('graphql-yoga')
+const { v4 : uuidv4 } = require('uuid')
 
 //Demo User data
 const users = [{
@@ -83,6 +84,12 @@ const typeDefs = `
         GetPosts (pst: String): [Post!]!
         GetCommets: [Comment!]!
     }
+    
+    type Mutation {
+        createUser(name: String!, email: String!, age: Int) : User!
+        createPost(title: String!, body: String!, published : Boolean!, author: ID!): Post!
+        createComment(text: String!, author: ID!, post: ID!) : Comment!
+    }
 
     type User{
         id: ID!
@@ -157,6 +164,65 @@ const resolvers = {
         },
         GetCommets(parent, args, ctx, info) {
             return comments;
+        }
+    },
+    Mutation: {
+        createUser(parent, args, ctx, info) {
+            const emailTaken = users.some((user) => { 
+                                return user.email == args.email
+            })
+
+            if (emailTaken) {
+                throw new Error('Email taken.')
+            }
+
+            const usr = {
+                id: uuidv4(),
+                name : args.name,
+                email: args.email,
+                age: args.age
+            }
+
+            users.push(usr)
+            return usr
+        },
+        createPost(parent, args, ctx, info) {
+            const userExists = users.some((user) => { 
+                return user.id == args.author
+            })
+
+            if (!userExists) {
+                throw new Error ('User is not found.')
+            }
+
+            const pst = {
+                id: uuidv4(),
+                title: args.title,
+                body: args.body,
+                published: args.published,
+                author: args.author
+            }
+
+            posts.push(pst)
+            return pst;
+        },
+        createComment(parent, args, ctx, info) {
+            const userExists = users.some((user) => user.id == args.author)
+            const postExists = posts.some((pst) => pst.id == args.post && pst.published == true)
+
+            if (!userExists || !postExists) {
+                throw new Error("Unable to find user and post.")
+            }
+
+            const cmt = {
+                id: uuidv4(),
+                text: args.text,
+                author: args.author,
+                post: args.post
+            }
+
+            comments.push(cmt)
+            return cmt
         }
     },
     Post: {
